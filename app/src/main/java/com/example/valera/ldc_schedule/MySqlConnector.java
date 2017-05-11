@@ -16,6 +16,16 @@ public final class MySqlConnector {
     private Connection conn;
     final private String LOG_CONN = "mySql connector log";
 
+    final static String ATTR_DOC_NAME       = "name";
+    final static String ATTR_DOC_SURNAME    = "surname";
+    final static String ATTR_DOC_PATR       = "patronymic";
+    final static String ATTR_SCHED_MON      = "mon";
+    final static String ATTR_SCHED_TUE      = "tue";
+    final static String ATTR_SCHED_WED      = "wed";
+    final static String ATTR_SCHED_THU      = "thu";
+    final static String ATTR_SCHED_FRI      = "fri";
+    final static String ATTR_SCHED_SAT      = "sat";
+
     public MySqlConnector(String inConnStr) throws ClassNotFoundException, SQLException, IllegalAccessException, InstantiationException{
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         conn = DriverManager.getConnection(inConnStr);

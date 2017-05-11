@@ -95,6 +95,10 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     };
 
     final private String LOG_SCHED_ACT = "Schedule activity";
+    final static String SERVER_ADDR         = "37.140.192.64";
+    final static String BASE_NAME           = "u0178389_u10393";
+    final static String USER_NAME           = "u0178389_u10393";
+    final static String PASS                = "adm2916";
     private ArrayList<Map<String, String>> alSchedule;
 
     @Override
@@ -128,7 +132,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     ArrayList<Map<String, String>> getSchedule(){
         AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader();
         ArrayList<Map<String, String>> alData = null;
-        asyncMSL.execute();
+        asyncMSL.execute(SERVER_ADDR, BASE_NAME, USER_NAME, PASS);
         try {
             alData = asyncMSL.get();
         } catch (InterruptedException e) {

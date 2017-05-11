@@ -6,20 +6,8 @@
     android:focusableInTouchMode="false">
 
     <TextView
-        android:text="324"
-        android:id="@+id/tvCab"
-        android:layout_weight="0.5"
-        style="@style/schedLargeTvStyle" />
-
-    <TextView
         android:text="Федоренко Юлия Юрьевна"
         android:id="@+id/tvDoc"
-        android:layout_weight="2"
-        style="@style/schedLargeTvStyle" />
-
-    <TextView
-        android:text="Терапевт"
-        android:id="@+id/tvPost"
         android:layout_weight="2"
         style="@style/schedLargeTvStyle" />
 

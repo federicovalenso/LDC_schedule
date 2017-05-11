@@ -12,59 +12,49 @@ import java.util.Map;
  * Created by valera on 05.05.2017.
  */
 
-public class AsyncMySqlLoader extends AsyncTask<Void, Void, ArrayList<Map<String, String>>> {
+public class AsyncMySqlLoader extends AsyncTask<String, Void, ArrayList<Map<String, String>>> {
 
     final private String LOG_CONN = "AsynkTask mySqlLoader";
-    final private String ATTR_DOC_NAME      = "name";
-    final private String ATTR_DOC_SURNAME   = "surname";
-    final private String ATTR_DOC_PATR      = "patronymic";
-    final private String ATTR_SCHED_MON      = "mon";
-    final private String ATTR_SCHED_TUE      = "tue";
-    final private String ATTR_SCHED_WED      = "wed";
-    final private String ATTR_SCHED_THU      = "thu";
-    final private String ATTR_SCHED_FRI      = "fri";
-    final private String ATTR_SCHED_SAT      = "sat";
-    final private String SERVER_ADDR        = "37.140.192.64";
-    final private String BASE_NAME          = "u0178389_u10393";
-    final private String USER_NAME          = "u0178389_u10393";
-    final private String PASS               = "adm2916";
+    final private int PARAM_SERVER_NAME = 0;
+    final private int PARAM_BASE_NAME = 1;
+    final private int PARAM_USER_NAME = 2;
+    final private int PARAM_PASS = 3;
 
     @Override
-    protected ArrayList doInBackground(Void... params) {
+    protected ArrayList doInBackground(String... params) {
 
         ArrayList<Map<String, String>> data = new ArrayList<>();
         try {
-            //jdbc:mysql://37.140.192.64/u0178389_u10393?user=u0178389_u10393&password=adm2916
-            MySqlConnector msc = new MySqlConnector("jdbc:mysql://" + SERVER_ADDR + "/"
-                                                                    + BASE_NAME + "?user="
-                                                                    + USER_NAME +"&password="
-                                                                    + PASS);
+            MySqlConnector msc = new MySqlConnector("jdbc:mysql://" + params[PARAM_SERVER_NAME] + "/"
+                                                                    + params[PARAM_BASE_NAME] + "?user="
+                                                                    + params[PARAM_USER_NAME] +"&password="
+                                                                    + params[PARAM_PASS]);
 
 
             ResultSet rs = msc.execSqlStatement("SELECT d.doc_id, " +
-                                                        "d.name as "+ ATTR_DOC_NAME +", " +
-                                                        "d.surname as " + ATTR_DOC_SURNAME + ", " +
-                                                        "d.patronymic as " + ATTR_DOC_PATR + ", " +
+                                                        "d.name as "+ MySqlConnector.ATTR_DOC_NAME +", " +
+                                                        "d.surname as " + MySqlConnector.ATTR_DOC_SURNAME + ", " +
+                                                        "d.patronymic as " + MySqlConnector.ATTR_DOC_PATR + ", " +
                                                         "s.doc_id, " +
-                                                        "s.mon as " + ATTR_SCHED_MON + ", " +
-                                                        "s.tue as " + ATTR_SCHED_TUE + ", " +
-                                                        "s.wed as " + ATTR_SCHED_WED + ", " +
-                                                        "s.thu as " + ATTR_SCHED_THU + ", " +
-                                                        "s.fri as " + ATTR_SCHED_FRI + ", " +
-                                                        "s.sat as " + ATTR_SCHED_SAT + " " +
+                                                        "s.mon as " + MySqlConnector.ATTR_SCHED_MON + ", " +
+                                                        "s.tue as " + MySqlConnector.ATTR_SCHED_TUE + ", " +
+                                                        "s.wed as " + MySqlConnector.ATTR_SCHED_WED + ", " +
+                                                        "s.thu as " + MySqlConnector.ATTR_SCHED_THU + ", " +
+                                                        "s.fri as " + MySqlConnector.ATTR_SCHED_FRI + ", " +
+                                                        "s.sat as " + MySqlConnector.ATTR_SCHED_SAT + " " +
                                                         "from docs as d INNER JOIN sched as s on s.doc_id = d.doc_id");
 
             while (rs.next()){
                 HashMap map = new HashMap<String, String>();
-                map.put(ATTR_DOC_NAME, rs.getString(ATTR_DOC_NAME));
-                map.put(ATTR_DOC_SURNAME, rs.getString(ATTR_DOC_SURNAME));
-                map.put(ATTR_DOC_PATR, rs.getString(ATTR_DOC_PATR));
-                map.put(ATTR_SCHED_MON, rs.getString(ATTR_SCHED_MON));
-                map.put(ATTR_SCHED_TUE, rs.getString(ATTR_SCHED_TUE));
-                map.put(ATTR_SCHED_WED, rs.getString(ATTR_SCHED_WED));
-                map.put(ATTR_SCHED_THU, rs.getString(ATTR_SCHED_THU));
-                map.put(ATTR_SCHED_FRI, rs.getString(ATTR_SCHED_FRI));
-                map.put(ATTR_SCHED_SAT, rs.getString(ATTR_SCHED_SAT));
+                map.put(MySqlConnector.ATTR_DOC_NAME, rs.getString(MySqlConnector.ATTR_DOC_NAME));
+                map.put(MySqlConnector.ATTR_DOC_SURNAME, rs.getString(MySqlConnector.ATTR_DOC_SURNAME));
+                map.put(MySqlConnector.ATTR_DOC_PATR, rs.getString(MySqlConnector.ATTR_DOC_PATR));
+                map.put(MySqlConnector.ATTR_SCHED_MON, rs.getString(MySqlConnector.ATTR_SCHED_MON));
+                map.put(MySqlConnector.ATTR_SCHED_TUE, rs.getString(MySqlConnector.ATTR_SCHED_TUE));
+                map.put(MySqlConnector.ATTR_SCHED_WED, rs.getString(MySqlConnector.ATTR_SCHED_WED));
+                map.put(MySqlConnector.ATTR_SCHED_THU, rs.getString(MySqlConnector.ATTR_SCHED_THU));
+                map.put(MySqlConnector.ATTR_SCHED_FRI, rs.getString(MySqlConnector.ATTR_SCHED_FRI));
+                map.put(MySqlConnector.ATTR_SCHED_SAT, rs.getString(MySqlConnector.ATTR_SCHED_SAT));
                 data.add(map);
             }
         } catch (Exception e) {
