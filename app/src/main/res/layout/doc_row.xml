@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:showDividers="middle"
+    android:focusableInTouchMode="false">
+
+    <TextView
+        android:text="324"
+        android:id="@+id/tvCab"
+        android:layout_weight="0.5"
+        style="@style/schedLargeTvStyle" />
+
+    <TextView
+        android:text="Федоренко Юлия Юрьевна"
+        android:id="@+id/tvDoc"
+        android:layout_weight="2"
+        style="@style/schedLargeTvStyle" />
+
+    <TextView
+        android:text="Терапевт"
+        android:id="@+id/tvPost"
+        android:layout_weight="2"
+        style="@style/schedLargeTvStyle" />
+
+    <TextView
+        android:id="@+id/tvMon"
+        android:layout_weight="1"
+        android:text="8:00 12:30"
+        style="@style/schedLargeTvWhStyle" />
+
+    <TextView
+        android:id="@+id/tvTue"
+        android:layout_weight="1"
+        android:text="8:00 12:30"
+        style="@style/schedLargeTvWhStyle" />
+
+    <TextView
+        android:id="@+id/tvWed"
+        android:layout_weight="1"
+        android:text="8:00 12:30"
+        style="@style/schedLargeTvWhStyle" />
+
+    <TextView
+        android:id="@+id/tvThu"
+        android:layout_weight="1"
+        android:text="8:00 12:30"
+        style="@style/schedLargeTvWhStyle" />
+
+    <TextView
+        android:id="@+id/tvFri"
+        android:layout_weight="1"
+        android:text="8:00 12:30"
+        style="@style/schedLargeTvWhStyle" />
+</LinearLayout>
