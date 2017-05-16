@@ -46,9 +46,10 @@ public class AsyncMySqlLoader extends AsyncTask<String, Void, ArrayList<Map<Stri
 
             while (rs.next()){
                 HashMap map = new HashMap<String, String>();
-                map.put(MySqlConnector.ATTR_DOC_NAME, rs.getString(MySqlConnector.ATTR_DOC_NAME));
-                map.put(MySqlConnector.ATTR_DOC_SURNAME, rs.getString(MySqlConnector.ATTR_DOC_SURNAME));
-                map.put(MySqlConnector.ATTR_DOC_PATR, rs.getString(MySqlConnector.ATTR_DOC_PATR));
+                String nsp = rs.getString(MySqlConnector.ATTR_DOC_NAME) + " " +
+                        rs.getString(MySqlConnector.ATTR_DOC_PATR) + " " +
+                        rs.getString(MySqlConnector.ATTR_DOC_SURNAME);
+                map.put(MySqlConnector.ATTR_DOC_NSP, nsp);
                 map.put(MySqlConnector.ATTR_SCHED_MON, rs.getString(MySqlConnector.ATTR_SCHED_MON));
                 map.put(MySqlConnector.ATTR_SCHED_TUE, rs.getString(MySqlConnector.ATTR_SCHED_TUE));
                 map.put(MySqlConnector.ATTR_SCHED_WED, rs.getString(MySqlConnector.ATTR_SCHED_WED));

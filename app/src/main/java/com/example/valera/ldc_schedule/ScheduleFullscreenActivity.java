@@ -1,12 +1,6 @@
 package com.example.valera.ldc_schedule;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.database.Cursor;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,10 +8,23 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_NAME;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_NSP;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_PATR;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SURNAME;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -42,7 +49,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private View mContentView;
+    private ListView mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -94,12 +101,21 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         }
     };
 
-    final private String LOG_SCHED_ACT = "Schedule activity";
+    private final View.OnTouchListener mRefreshDataListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            refreshData();
+            return false;
+        }
+    };
+
+    final private String LOG_SCHED_ACT      = "Schedule activity";
     final static String SERVER_ADDR         = "37.140.192.64";
     final static String BASE_NAME           = "u0178389_u10393";
     final static String USER_NAME           = "u0178389_u10393";
     final static String PASS                = "adm2916";
     private ArrayList<Map<String, String>> alSchedule;
+    private SimpleAdapter lvAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,13 +125,12 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
-
+        mContentView = (ListView) findViewById(R.id.fullscreen_content);
 
         // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
+        mContentView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toggle();
             }
         });
@@ -124,8 +139,9 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        findViewById(R.id.refresh_button).setOnTouchListener(mRefreshDataListener);
 
-        alSchedule = getSchedule();
+        refreshData();
 
     }
 
@@ -195,6 +211,26 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private void refreshData(){
+        alSchedule = getSchedule();
+        String[] from = {   ATTR_DOC_NSP,
+                            ATTR_SCHED_MON,
+                            ATTR_SCHED_TUE,
+                            ATTR_SCHED_WED,
+                            ATTR_SCHED_THU,
+                            ATTR_SCHED_FRI};
+
+        int[] to = {    R.id.tvDoc,
+                        R.id.tvMon,
+                        R.id.tvTue,
+                        R.id.tvWed,
+                        R.id.tvThu,
+                        R.id.tvFri};
+
+        lvAdapter = new SimpleAdapter(this, alSchedule, R.layout.doc_row, from, to);
+        mContentView.setAdapter(lvAdapter);
     }
 
     protected void onDestroy() {
