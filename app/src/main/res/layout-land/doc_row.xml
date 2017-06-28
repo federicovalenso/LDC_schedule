@@ -1,43 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:showDividers="middle"
-    android:focusableInTouchMode="false">
+    android:layout_marginTop="2dp"
+    android:focusableInTouchMode="false"
+    android:orientation="horizontal"
+    android:showDividers="middle">
 
     <TextView
-        android:text="Федоренко Юлия Юрьевна"
         android:id="@+id/tvDoc"
+        style="@style/schedLargeTvStyle"
         android:layout_weight="5"
-        style="@style/schedLargeTvStyle" />
+        android:text="Федоренко Юлия Юрьевна" />
 
     <TextView
         android:id="@+id/tvMon"
+        style="@style/schedLargeTvWhStyle"
         android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        android:text="8:00\n12:30" />
 
     <TextView
         android:id="@+id/tvTue"
+        style="@style/schedLargeTvWhStyle"
         android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        android:text="8:00 12:30" />
 
     <TextView
         android:id="@+id/tvWed"
+        style="@style/schedLargeTvWhStyle"
         android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        android:text="8:00 12:30" />
 
     <TextView
         android:id="@+id/tvThu"
+        style="@style/schedLargeTvWhStyle"
         android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        android:text="8:00 12:30" />
 
     <TextView
         android:id="@+id/tvFri"
+        style="@style/schedLargeTvWhStyle"
+        android:layout_marginRight="0dp"
         android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        android:text="8:00 12:30" />
 </LinearLayout>

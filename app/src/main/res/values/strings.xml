@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LDC_schedule</string>
 
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="refresh_button">Refresh</string>
+    <string name="options_button">Options</string>
+    <string name="check_connection">Check your internet connection</string>
 </resources>

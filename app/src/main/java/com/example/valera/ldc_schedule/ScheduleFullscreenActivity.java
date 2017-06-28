@@ -1,35 +1,34 @@
 package com.example.valera.ldc_schedule;
 
 import android.annotation.SuppressLint;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_NAME;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_NSP;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_PATR;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SURNAME;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class ScheduleFullscreenActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -47,6 +46,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
+
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private ListView mContentView;
@@ -67,7 +67,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private View mControlsView;
+
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -76,7 +76,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.show();
             }
-            mControlsView.setVisibility(View.VISIBLE);
         }
     };
     private boolean mVisible;
@@ -124,7 +123,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_schedule_fullscreen);
 
         mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = (ListView) findViewById(R.id.fullscreen_content);
 
         // Set up the user interaction to manually show or hide the system UI.
@@ -135,29 +133,41 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             }
         });
 
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-        findViewById(R.id.refresh_button).setOnTouchListener(mRefreshDataListener);
+        String[] from = {ATTR_DOC_SNP,
+                ATTR_SCHED_MON,
+                ATTR_SCHED_TUE,
+                ATTR_SCHED_WED,
+                ATTR_SCHED_THU,
+                ATTR_SCHED_FRI};
 
+        int[] to = {R.id.tvDoc,
+                R.id.tvMon,
+                R.id.tvTue,
+                R.id.tvWed,
+                R.id.tvThu,
+                R.id.tvFri};
+
+        alSchedule = new ArrayList<>();
         refreshData();
+        lvAdapter = new SimpleAdapter(this, alSchedule, R.layout.doc_row, from, to);
+        mContentView.setAdapter(lvAdapter);
 
     }
 
-    ArrayList<Map<String, String>> getSchedule(){
-        AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader();
-        ArrayList<Map<String, String>> alData = null;
-        asyncMSL.execute(SERVER_ADDR, BASE_NAME, USER_NAME, PASS);
-        try {
-            alData = asyncMSL.get();
-        } catch (InterruptedException e) {
-            Log.e(LOG_SCHED_ACT, "onCreate: ", e);
-        } catch (ExecutionException e) {
-            Log.e(LOG_SCHED_ACT, "onCreate: ", e);
-        } finally {
-            return alData;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.schedule_act__menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.mi_refresh:
+                refreshData();
+                return true;
         }
+        return false;
     }
 
     @Override
@@ -184,7 +194,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -213,29 +222,38 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    public void setSchedData(ArrayList<Map<String, String>> inAlData){
+        alSchedule.clear();
+        for (Map<String, String> item : inAlData){
+            alSchedule.add(item);
+        }
+        lvAdapter.notifyDataSetChanged();
+    }
+
     private void refreshData(){
-        alSchedule = getSchedule();
-        String[] from = {   ATTR_DOC_NSP,
-                            ATTR_SCHED_MON,
-                            ATTR_SCHED_TUE,
-                            ATTR_SCHED_WED,
-                            ATTR_SCHED_THU,
-                            ATTR_SCHED_FRI};
 
-        int[] to = {    R.id.tvDoc,
-                        R.id.tvMon,
-                        R.id.tvTue,
-                        R.id.tvWed,
-                        R.id.tvThu,
-                        R.id.tvFri};
+        if (checkNetworkConnection()) {
+            AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader();
+            asyncMSL.link(this);
+            asyncMSL.execute(SERVER_ADDR, BASE_NAME, USER_NAME, PASS);
+        }
+        else {
+            Toast.makeText(getApplicationContext(),"Check your internet connection",Toast.LENGTH_LONG).show();
+        }
+    }
 
-        lvAdapter = new SimpleAdapter(this, alSchedule, R.layout.doc_row, from, to);
-        mContentView.setAdapter(lvAdapter);
+    /**
+     * Check whether the device is connected
+     */
+    private boolean checkNetworkConnection() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
+        return (activeInfo != null && activeInfo.isConnected());
     }
 
     protected void onDestroy() {
         super.onDestroy();
     }
-
 
 }

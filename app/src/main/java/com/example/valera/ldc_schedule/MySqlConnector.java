@@ -19,7 +19,7 @@ public final class MySqlConnector {
     final static String ATTR_DOC_NAME       = "name";
     final static String ATTR_DOC_SURNAME    = "surname";
     final static String ATTR_DOC_PATR       = "patronymic";
-    final static String ATTR_DOC_NSP        = "nsp";
+    final static String ATTR_DOC_SNP        = "snp";
     final static String ATTR_SCHED_MON      = "mon";
     final static String ATTR_SCHED_TUE      = "tue";
     final static String ATTR_SCHED_WED      = "wed";

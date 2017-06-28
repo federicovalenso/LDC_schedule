@@ -26,7 +26,8 @@
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:background">@android:color/holo_blue_dark</item>
-        <item name="android:layout_margin">1dp</item>
+        <item name="android:layout_marginRight">2dp</item>
+        <item name="android:padding">1dp</item>
         <item name="android:textColor">#ffffff</item>
     </style>
 
