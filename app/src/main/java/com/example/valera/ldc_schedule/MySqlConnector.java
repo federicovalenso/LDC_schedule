@@ -9,10 +9,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Created by valera on 04.05.2017.
+ * Установка подключения к MySql-серверу и исполнение запросов
  */
 
-public final class MySqlConnector {
+final class MySqlConnector {
     private Connection conn;
     final private String LOG_CONN = "mySql connector log";
 
@@ -27,20 +27,21 @@ public final class MySqlConnector {
     final static String ATTR_SCHED_FRI      = "fri";
     final static String ATTR_SCHED_SAT      = "sat";
 
-    public MySqlConnector(String inConnStr) throws ClassNotFoundException, SQLException, IllegalAccessException, InstantiationException{
+    MySqlConnector(String inConnStr) throws ClassNotFoundException, SQLException, IllegalAccessException, InstantiationException{
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         conn = DriverManager.getConnection(inConnStr);
     }
 
     protected void finalize() {
         try {
+            super.finalize();
             conn.close();
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             Log.e(LOG_CONN, "finalize: " + e.getMessage());
         }
     }
 
-    public ResultSet execSqlStatement(String query) throws SQLException {
+    ResultSet execSqlStatement(String query) throws SQLException {
         Statement stmt = conn.createStatement();
         return stmt.executeQuery(query);
     }

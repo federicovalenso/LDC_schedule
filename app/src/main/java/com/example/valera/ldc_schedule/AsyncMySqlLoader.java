@@ -6,51 +6,53 @@ import android.util.Log;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_NAME;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_PATR;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SURNAME;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_SAT;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_SAT;
 
 /**
- * Created by valera on 05.05.2017.
+ * AsyncTask.
+ * Загружает данные через MySqlConnector с MySql-сервера
  */
 
-public class AsyncMySqlLoader extends AsyncTask<String, Void, ArrayList<Map<String, String>>> {
+class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<String, String>>> {
 
-    final private String LOG_CONN = "AsynkTask mySqlLoader";
-    final private int PARAM_SERVER_NAME = 0;
-    final private int PARAM_BASE_NAME = 1;
-    final private int PARAM_USER_NAME = 2;
-    final private int PARAM_PASS = 3;
     private ScheduleFullscreenActivity Activity;
 
-    void link(ScheduleFullscreenActivity inActivity){
-        Activity = inActivity;
+    public AsyncMySqlLoader(ScheduleFullscreenActivity _Activity) {
+        Activity = _Activity;
     }
 
-    void unLink(){
-        Activity = null;
+    @Override
+    protected void onPreExecute() {
+        Activity.progBar.setProgress(0);
     }
 
     @Override
     protected ArrayList doInBackground(String... params) {
 
-        ArrayList<Map<String, String>> data = new ArrayList<>();
+        final String LOG_CONN = "AsynkTask mySqlLoader";
+        final int PARAM_SERVER_NAME = 0;
+        final int PARAM_BASE_NAME = 1;
+        final int PARAM_USER_NAME = 2;
+        final int PARAM_PASS = 3;
+        int progress = 20;
+        ArrayList<HashMap<String, String>> data = new ArrayList<>();
 
         try {
             MySqlConnector msc = new MySqlConnector("jdbc:mysql://" + params[PARAM_SERVER_NAME] + "/"
                                                                     + params[PARAM_BASE_NAME] + "?user="
                                                                     + params[PARAM_USER_NAME] +"&password="
                                                                     + params[PARAM_PASS]);
-
+            publishProgress(progress);
 
             ResultSet rs = msc.execSqlStatement("SELECT d.doc_id, " +
                                                         "d.name as "+ ATTR_DOC_NAME +", " +
@@ -66,7 +68,7 @@ public class AsyncMySqlLoader extends AsyncTask<String, Void, ArrayList<Map<Stri
                                                         "from docs as d INNER JOIN sched as s on s.doc_id = d.doc_id");
 
             while (rs.next()){
-                HashMap map = new HashMap<String, String>();
+                HashMap<String, String> map = new HashMap<>();
                 String snp = rs.getString(ATTR_DOC_SURNAME) + " " +
                         rs.getString(ATTR_DOC_NAME) + " " +
                         rs.getString(ATTR_DOC_PATR);
@@ -78,6 +80,7 @@ public class AsyncMySqlLoader extends AsyncTask<String, Void, ArrayList<Map<Stri
                 map.put(ATTR_SCHED_FRI, rs.getString(ATTR_SCHED_FRI));
                 map.put(ATTR_SCHED_SAT, rs.getString(ATTR_SCHED_SAT));
                 data.add(map);
+                publishProgress(progress + 5);
             }
         } catch (Exception e) {
             Log.e(LOG_CONN, "doInBackground: ", e);
@@ -88,8 +91,15 @@ public class AsyncMySqlLoader extends AsyncTask<String, Void, ArrayList<Map<Stri
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Map<String, String>> map) {
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        Activity.progBar.setProgress(values[0]);
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<HashMap<String, String>> map) {
         super.onPostExecute(map);
         Activity.setSchedData(map);
+        Activity.progBar.setProgress(100);
     }
 }

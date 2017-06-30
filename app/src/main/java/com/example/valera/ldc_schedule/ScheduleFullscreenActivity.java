@@ -14,13 +14,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
@@ -113,14 +112,18 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     final static String BASE_NAME           = "u0178389_u10393";
     final static String USER_NAME           = "u0178389_u10393";
     final static String PASS                = "adm2916";
-    private ArrayList<Map<String, String>> alSchedule;
+    private ArrayList<HashMap<String, String>> alSchedule;
     private SimpleAdapter lvAdapter;
+    protected ProgressBar progBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_schedule_fullscreen);
+
+        progBar = (ProgressBar) findViewById(R.id.progressBar);
+        progBar.setVisibility(View.VISIBLE);
 
         mVisible = true;
         mContentView = (ListView) findViewById(R.id.fullscreen_content);
@@ -222,19 +225,19 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    public void setSchedData(ArrayList<Map<String, String>> inAlData){
+    public void setSchedData(ArrayList<HashMap<String, String>> inAlData){
         alSchedule.clear();
-        for (Map<String, String> item : inAlData){
+        for (HashMap<String, String> item : inAlData){
             alSchedule.add(item);
         }
         lvAdapter.notifyDataSetChanged();
+        progBar.setVisibility(View.INVISIBLE);
     }
 
     private void refreshData(){
 
         if (checkNetworkConnection()) {
-            AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader();
-            asyncMSL.link(this);
+            AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader(this);
             asyncMSL.execute(SERVER_ADDR, BASE_NAME, USER_NAME, PASS);
         }
         else {

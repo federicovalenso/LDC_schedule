@@ -13,6 +13,21 @@
         android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1" >
+
+    </ListView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/progress_bar_height"
+        android:layout_gravity="bottom"
+        android:clickable="false"
+        android:indeterminate="false"
+        android:progressDrawable="@color/colorAccent"
+        android:progressTint="@color/colorPrimaryDark"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </FrameLayout>

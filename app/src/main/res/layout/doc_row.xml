@@ -1,43 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:showDividers="middle"
     android:focusableInTouchMode="false">
 
     <TextView
-        android:text="Федоренко Юлия Юрьевна"
         android:id="@+id/tvDoc"
-        android:layout_weight="2"
-        style="@style/schedLargeTvStyle" />
+        style="@style/schedLargeTvNameVertStyle"
+        android:layout_height="wrap_content"
+        android:background="@color/doc_color"
+        android:text="Федоренко Юлия Юрьевна"
+        tools:style="@style/schedLargeTvStyle" />
 
-    <TextView
-        android:id="@+id/tvMon"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvTue"
-        android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        <TextView
+            style="@style/schedTvDayNameStyle"
+            android:layout_weight="1"
+            android:background="@color/day_name_color"
+            android:text="ПН" />
 
-    <TextView
-        android:id="@+id/tvWed"
-        android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        <TextView
+            style="@style/schedTvDayNameStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="ВТ" />
 
-    <TextView
-        android:id="@+id/tvThu"
-        android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        <TextView
+            style="@style/schedTvDayNameStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="СР" />
 
-    <TextView
-        android:id="@+id/tvFri"
-        android:layout_weight="1"
-        android:text="8:00 12:30"
-        style="@style/schedLargeTvWhStyle" />
+        <TextView
+            style="@style/schedTvDayNameStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="ЧТ" />
+
+        <TextView
+            style="@style/schedTvDayNameStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="ПТ" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvMon"
+            style="@style/schedLargeTvWhStyle"
+            android:layout_weight="1"
+            android:text="8:00 12:30" />
+
+        <TextView
+            android:id="@+id/tvTue"
+            style="@style/schedLargeTvWhStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="8:00 12:30" />
+
+        <TextView
+            android:id="@+id/tvWed"
+            style="@style/schedLargeTvWhStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="8:00 12:30" />
+
+        <TextView
+            android:id="@+id/tvThu"
+            style="@style/schedLargeTvWhStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="8:00 12:30" />
+
+        <TextView
+            android:id="@+id/tvFri"
+            style="@style/schedLargeTvWhStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="8:00 12:30" />
+    </LinearLayout>
+
 </LinearLayout>

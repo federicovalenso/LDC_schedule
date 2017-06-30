@@ -17,11 +17,18 @@
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
 
-    <FrameLayout
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-
-    </FrameLayout>
+        android:layout_height="@dimen/progress_bar_height"
+        android:layout_gravity="bottom"
+        android:clickable="false"
+        android:indeterminate="false"
+        android:max="@integer/progbar_max"
+        android:progressDrawable="@color/colorPrimaryDark"
+        android:progressTint="@color/colorAccent"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
 </FrameLayout>

@@ -31,16 +31,31 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
+    <style name="schedTvNameVertStyle" parent="schedTvStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/doc_color</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
+
     <style name="schedLargeTvStyle" parent="schedTvStyle">
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="schedLargeTvNameVertStyle" parent="schedTvNameVertStyle">
         <item name="android:textSize">28sp</item>
     </style>
 
     <style name="schedTvWhStyle" parent="schedTvStyle">
         <item name="android:gravity">center_horizontal|center_vertical</item>
+        <item name="android:layout_weight">1</item>
     </style>
 
     <style name="schedLargeTvWhStyle" parent="schedTvWhStyle">
         <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="schedTvDayNameStyle" parent="schedTvWhStyle">
+        <item name="android:background">@color/day_name_color</item>
     </style>
 
 </resources>
