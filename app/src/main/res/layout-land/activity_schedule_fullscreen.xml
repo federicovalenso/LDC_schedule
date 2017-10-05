@@ -1,34 +1,76 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/background_light"
+    android:orientation="vertical"
+    android:weightSum="100"
     tools:context="com.example.valera.ldc_schedule.ScheduleFullscreenActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
 
-    <ListView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/progress_bar_height"
-        android:layout_gravity="bottom"
-        android:clickable="false"
-        android:indeterminate="false"
-        android:max="@integer/progbar_max"
-        android:progressDrawable="@color/colorPrimaryDark"
-        android:progressTint="@color/colorAccent"
-        android:visibility="invisible"
-        tools:visibility="visible" />
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp"
+    android:layout_weight="10"
+    android:focusableInTouchMode="false"
+    android:orientation="horizontal"
+    android:showDividers="middle"
+    android:weightSum="100">
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tvDoc"
+        style="@style/schedTvColNameVertStyle"
+        android:layout_weight="30"
+        android:text="@string/doc_name_col" />
+
+    <TextView
+        android:id="@+id/tvPost"
+        style="@style/schedTvColNameVertStyle"
+        android:layout_weight="30"
+        android:text="@string/post_col" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="40"
+        android:orientation="horizontal">
+
+        <TextView
+        style="@style/schedTvColNameVertStyle"
+        android:text="@string/mon_col" />
+
+        <TextView
+            style="@style/schedTvColNameVertStyle"
+            android:text="@string/tue_col" />
+
+        <TextView
+            style="@style/schedTvColNameVertStyle"
+            android:text="@string/wed_col" />
+
+        <TextView
+            style="@style/schedTvColNameVertStyle"
+            android:text="@string/thu_col" />
+
+        <TextView
+            style="@style/schedTvColNameVertStyle"
+            android:text="@string/fri_col" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+    <ListView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="90">
+    </ListView>
+
+</LinearLayout>

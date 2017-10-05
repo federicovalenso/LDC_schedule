@@ -2,6 +2,7 @@ package com.example.valera.ldc_schedule;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -22,11 +22,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_POST;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON_END;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE_END;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED_END;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU_END;
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI_END;
 
 public class ScheduleFullscreenActivity extends AppCompatActivity {
     /**
@@ -114,20 +120,13 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     final static String PASS                = "adm2916";
     private ArrayList<HashMap<String, String>> alSchedule;
     private SimpleAdapter lvAdapter;
-    protected ProgressBar progBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_schedule_fullscreen);
-
-        progBar = (ProgressBar) findViewById(R.id.progressBar);
-        progBar.setVisibility(View.VISIBLE);
-
         mVisible = true;
         mContentView = (ListView) findViewById(R.id.fullscreen_content);
-
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -135,26 +134,41 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 toggle();
             }
         });
-
-        String[] from = {ATTR_DOC_SNP,
+        String[] from = {
+                ATTR_DOC_SNP,
+                ATTR_DOC_POST,
                 ATTR_SCHED_MON,
+                ATTR_SCHED_MON_END,
                 ATTR_SCHED_TUE,
+                ATTR_SCHED_TUE_END,
                 ATTR_SCHED_WED,
+                ATTR_SCHED_WED_END,
                 ATTR_SCHED_THU,
-                ATTR_SCHED_FRI};
-
-        int[] to = {R.id.tvDoc,
+                ATTR_SCHED_THU_END,
+                ATTR_SCHED_FRI,
+                ATTR_SCHED_FRI_END};
+        int[] to = {
+                R.id.tvDoc,
+                R.id.tvPost,
                 R.id.tvMon,
+                R.id.tvMonEnd,
                 R.id.tvTue,
+                R.id.tvTueEnd,
                 R.id.tvWed,
+                R.id.tvWedEnd,
                 R.id.tvThu,
-                R.id.tvFri};
-
+                R.id.tvThuEnd,
+                R.id.tvFri,
+                R.id.tvFriEnd};
         alSchedule = new ArrayList<>();
         refreshData();
         lvAdapter = new SimpleAdapter(this, alSchedule, R.layout.doc_row, from, to);
         mContentView.setAdapter(lvAdapter);
+    }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -231,7 +245,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             alSchedule.add(item);
         }
         lvAdapter.notifyDataSetChanged();
-        progBar.setVisibility(View.INVISIBLE);
     }
 
     private void refreshData(){

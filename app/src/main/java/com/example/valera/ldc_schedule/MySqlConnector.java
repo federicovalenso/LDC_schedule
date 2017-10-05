@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 
 /**
  * Установка подключения к MySql-серверу и исполнение запросов
@@ -20,11 +21,17 @@ final class MySqlConnector {
     final static String ATTR_DOC_SURNAME    = "surname";
     final static String ATTR_DOC_PATR       = "patronymic";
     final static String ATTR_DOC_SNP        = "snp";
+    final static String ATTR_DOC_POST       = "post";
     final static String ATTR_SCHED_MON      = "mon";
+    final static String ATTR_SCHED_MON_END  = "mon_end";
     final static String ATTR_SCHED_TUE      = "tue";
+    final static String ATTR_SCHED_TUE_END  = "tue_end";
     final static String ATTR_SCHED_WED      = "wed";
+    final static String ATTR_SCHED_WED_END  = "wed_end";
     final static String ATTR_SCHED_THU      = "thu";
+    final static String ATTR_SCHED_THU_END  = "thu_end";
     final static String ATTR_SCHED_FRI      = "fri";
+    final static String ATTR_SCHED_FRI_END  = "fri_end";
     final static String ATTR_SCHED_SAT      = "sat";
 
     MySqlConnector(String inConnStr) throws ClassNotFoundException, SQLException, IllegalAccessException, InstantiationException{
