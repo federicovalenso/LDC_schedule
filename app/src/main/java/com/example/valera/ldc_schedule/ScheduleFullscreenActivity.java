@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -16,10 +17,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Console;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_POST;
@@ -118,13 +125,23 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     final static String BASE_NAME           = "u0178389_u10393";
     final static String USER_NAME           = "u0178389_u10393";
     final static String PASS                = "adm2916";
+    private TextView tvDateTime;
     private ArrayList<HashMap<String, String>> alSchedule;
     private SimpleAdapter lvAdapter;
+    Timer timerDataRefresher;
+    Timer timerDateTimeRefresher;
+    TimerTask ttDataRefresher;
+    TimerTask ttDateTimeRefresher;
+    final private long lDataRefresherTimerInterval = 60*1000;
+    final private long lDateTimeRefresherTimerInterval = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_fullscreen);
+        tvDateTime = (TextView) findViewById(R.id.tvDateTime);
+        timerDateTimeRefresher = new Timer();
+        refreshDateTimeByTimer();
         mVisible = true;
         mContentView = (ListView) findViewById(R.id.fullscreen_content);
         // Set up the user interaction to manually show or hide the system UI.
@@ -161,9 +178,49 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 R.id.tvFri,
                 R.id.tvFriEnd};
         alSchedule = new ArrayList<>();
-        refreshData();
+        timerDataRefresher = new Timer();
+        refreshDataByTimer();
         lvAdapter = new SimpleAdapter(this, alSchedule, R.layout.doc_row, from, to);
         mContentView.setAdapter(lvAdapter);
+    }
+
+    void refreshDateTimeByTimer() {
+        if (ttDateTimeRefresher != null) {
+            ttDateTimeRefresher.cancel();
+        }
+        ttDateTimeRefresher = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvDateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
+                    }
+                });
+            }
+        };
+        timerDateTimeRefresher.schedule(ttDateTimeRefresher, 0, lDateTimeRefresherTimerInterval);
+    }
+
+    void refreshDataByTimer() {
+        if (ttDataRefresher != null) {
+            ttDataRefresher.cancel();
+        }
+        if (lDataRefresherTimerInterval > 0) {
+            ttDataRefresher = new TimerTask() {
+                @Override
+                public void run() {
+                    Log.d(LOG_SCHED_ACT, "Don't sleep");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshData();
+                        }
+                    });
+                }
+            };
+            timerDataRefresher.schedule(ttDataRefresher, 0, lDataRefresherTimerInterval);
+        }
     }
 
     @Override

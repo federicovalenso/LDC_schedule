@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="2dp"
@@ -14,9 +13,7 @@
     <TextView
         android:id="@+id/tvDoc"
         style="@style/schedLargeTvStyle"
-        android:layout_weight="30"
-        android:padding="0dp"
-        tools:text="Федоренко Юлия Юрьевна" />
+        android:layout_weight="30" />
 
     <TextView
         android:id="@+id/tvPost"
