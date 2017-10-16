@@ -3,10 +3,12 @@ package com.example.valera.ldc_schedule;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,7 +22,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.Console;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -127,7 +128,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     final static String PASS                = "adm2916";
     private TextView tvDateTime;
     private ArrayList<HashMap<String, String>> alSchedule;
-    private SimpleAdapter lvAdapter;
+    private schedAdapter lvAdapter;
     Timer timerDataRefresher;
     Timer timerDateTimeRefresher;
     TimerTask ttDataRefresher;
@@ -177,10 +178,22 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 R.id.tvThuEnd,
                 R.id.tvFri,
                 R.id.tvFriEnd};
+        int firstRowColor = ContextCompat.getColor(this, R.color.sched_row_first_color);
+        int secondRowColor = ContextCompat.getColor(this, R.color.sched_row_second_color);
+        int[] colors = {
+                firstRowColor,
+                secondRowColor,
+                firstRowColor,
+                secondRowColor,
+                firstRowColor,
+                secondRowColor,
+                firstRowColor,
+                secondRowColor,
+                firstRowColor};
         alSchedule = new ArrayList<>();
         timerDataRefresher = new Timer();
         refreshDataByTimer();
-        lvAdapter = new SimpleAdapter(this, alSchedule, R.layout.doc_row, from, to);
+        lvAdapter = new schedAdapter(this, alSchedule, R.layout.doc_row, from, to, colors);
         mContentView.setAdapter(lvAdapter);
     }
 

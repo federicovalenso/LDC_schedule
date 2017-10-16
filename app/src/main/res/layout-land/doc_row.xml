@@ -13,14 +13,12 @@
 
     <TextView
         android:id="@+id/tvDoc"
-        style="@style/schedLargeTvStyle"
-        android:layout_weight="30"
-        android:padding="0dp"
-        tools:text="Федоренко Юлия Юрьевна" />
+        style="@style/schedLargeTvNameStyle"
+        android:layout_weight="30" />
 
     <TextView
         android:id="@+id/tvPost"
-        style="@style/schedLargeTvStyle"
+        style="@style/schedLargeTvPostStyle"
         android:layout_weight="30" />
 
     <LinearLayout
@@ -54,7 +52,7 @@
 
             <TextView
                 android:id="@+id/tvFri"
-                style="@style/schedLargeTvWhStyle" />
+                style="@style/schedLargeTvWhStyleLastChild" />
 
         </LinearLayout>
 
@@ -82,7 +80,7 @@
 
             <TextView
                 android:id="@+id/tvFriEnd"
-                style="@style/schedLargeTvWhStyle" />
+                style="@style/schedLargeTvWhStyleLastChild" />
 
         </LinearLayout>
 

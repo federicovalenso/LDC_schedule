@@ -17,9 +17,6 @@ final class MySqlConnector {
     private Connection conn;
     final private String LOG_CONN = "mySql connector log";
 
-    final static String ATTR_DOC_NAME       = "name";
-    final static String ATTR_DOC_SURNAME    = "surname";
-    final static String ATTR_DOC_PATR       = "patronymic";
     final static String ATTR_DOC_SNP        = "snp";
     final static String ATTR_DOC_POST       = "post";
     final static String ATTR_SCHED_MON      = "mon";
