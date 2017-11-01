@@ -19,7 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="0.5dp"
-        android:layout_marginTop="0.5dp"
         android:layout_weight="4"
         android:focusableInTouchMode="false"
         android:orientation="horizontal"
@@ -31,7 +30,8 @@
             android:layout_height="match_parent"
             android:background="@android:color/black"
             android:gravity="center_vertical|center_horizontal"
-            android:textColor="@android:color/white"
+            android:textColor="@color/time_row_color"
+            android:textStyle="bold"
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -47,13 +47,16 @@
         android:weightSum="100">
 
         <TextView
-            android:id="@+id/tvDoc"
             style="@style/schedTvColNameVertStyle"
-            android:layout_weight="30"
+            android:layout_weight="8"
+            android:text="@string/cab_col"/>
+
+        <TextView
+            style="@style/schedTvColNameVertStyle"
+            android:layout_weight="22"
             android:text="@string/doc_name_col" />
 
         <TextView
-            android:id="@+id/tvPost"
             style="@style/schedTvColNameVertStyle"
             android:layout_weight="30"
             android:text="@string/post_col" />

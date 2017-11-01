@@ -2,12 +2,13 @@ package com.example.valera.ldc_schedule;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,17 +19,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_CAB;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_POST;
 import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
@@ -122,10 +124,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     };
 
     final private String LOG_SCHED_ACT      = "Schedule activity";
-    final static String SERVER_ADDR         = "37.140.192.64";
-    final static String BASE_NAME           = "u0178389_u10393";
-    final static String USER_NAME           = "u0178389_u10393";
-    final static String PASS                = "adm2916";
     private TextView tvDateTime;
     private ArrayList<HashMap<String, String>> alSchedule;
     private schedAdapter lvAdapter;
@@ -140,6 +138,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_fullscreen);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
         tvDateTime = (TextView) findViewById(R.id.tvDateTime);
         timerDateTimeRefresher = new Timer();
         refreshDateTimeByTimer();
@@ -152,7 +151,15 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 toggle();
             }
         });
+        TextView tvDateTime = (TextView) findViewById(R.id.tvDateTime);
+        tvDateTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggle();
+            }
+        });
         String[] from = {
+                ATTR_CAB,
                 ATTR_DOC_SNP,
                 ATTR_DOC_POST,
                 ATTR_SCHED_MON,
@@ -166,6 +173,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 ATTR_SCHED_FRI,
                 ATTR_SCHED_FRI_END};
         int[] to = {
+                R.id.tvCab,
                 R.id.tvDoc,
                 R.id.tvPost,
                 R.id.tvMon,
@@ -207,7 +215,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        tvDateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
+                        tvDateTime.setText(new SimpleDateFormat("d MMM y EEEE H:mm:ss").format(new Date()));
                     }
                 });
             }
@@ -237,6 +245,20 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        timerDateTimeRefresher.cancel();
+        timerDataRefresher.cancel();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        refreshDateTimeByTimer();
+//        refreshDataByTimer();
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
@@ -252,7 +274,9 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.mi_refresh:
                 refreshData();
-                return true;
+                break;
+            case R.id.mi_options:
+                showAppOptions();
         }
         return false;
     }
@@ -310,22 +334,38 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     }
 
     public void setSchedData(ArrayList<HashMap<String, String>> inAlData){
-        alSchedule.clear();
-        for (HashMap<String, String> item : inAlData){
-            alSchedule.add(item);
+        if (inAlData != null) {
+            alSchedule.clear();
+            for (HashMap<String, String> item : inAlData){
+                alSchedule.add(item);
+            }
+            lvAdapter.notifyDataSetChanged();
         }
-        lvAdapter.notifyDataSetChanged();
+        else {
+            Toast.makeText(this.getApplicationContext(),
+                    "Empty data returned from server",
+                    Toast.LENGTH_LONG).show();
+            if (mVisible == false) {
+                show();
+            }
+        }
     }
 
     private void refreshData(){
 
         if (checkNetworkConnection()) {
             AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader(this);
-            asyncMSL.execute(SERVER_ADDR, BASE_NAME, USER_NAME, PASS);
+            asyncMSL.execute();
         }
         else {
-            Toast.makeText(getApplicationContext(),"Check your internet connection",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),
+                    "Check your internet connection",
+                    Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showAppOptions() {
+        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
     }
 
     /**

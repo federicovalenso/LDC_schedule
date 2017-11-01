@@ -1,5 +1,8 @@
 package com.example.valera.ldc_schedule;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.sql.Connection;
@@ -16,7 +19,7 @@ import java.util.HashMap;
 final class MySqlConnector {
     private Connection conn;
     final private String LOG_CONN = "mySql connector log";
-
+    final static String ATTR_CAB            = "cab";
     final static String ATTR_DOC_SNP        = "snp";
     final static String ATTR_DOC_POST       = "post";
     final static String ATTR_SCHED_MON      = "mon";
@@ -31,7 +34,18 @@ final class MySqlConnector {
     final static String ATTR_SCHED_FRI_END  = "fri_end";
     final static String ATTR_SCHED_SAT      = "sat";
 
-    MySqlConnector(String inConnStr) throws ClassNotFoundException, SQLException, IllegalAccessException, InstantiationException{
+    MySqlConnector(final String serverName,
+                   final String baseName,
+                   final String userName,
+                   final String password)
+            throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+        this("jdbc:mysql://" + serverName + "/"
+                    + baseName + "?user="
+                    + userName +"&password="
+                    + password);
+    }
+
+    MySqlConnector(final String inConnStr) throws ClassNotFoundException, SQLException, IllegalAccessException, InstantiationException {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         conn = DriverManager.getConnection(inConnStr);
     }

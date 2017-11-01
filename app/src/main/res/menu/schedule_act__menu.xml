@@ -12,6 +12,7 @@
         android:id="@+id/mi_options"
         android:icon="@drawable/ic_ab_options"
         android:title="@string/options_button"
-        app:showAsAction="ifRoom"></item>
+        app:showAsAction="ifRoom">
+    </item>
 
 </menu>

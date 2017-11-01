@@ -12,9 +12,14 @@
     android:weightSum="100">
 
     <TextView
+        android:id="@+id/tvCab"
+        style="@style/schedLargeTvWhStyle"
+        android:layout_weight="8" />
+
+    <TextView
         android:id="@+id/tvDoc"
         style="@style/schedLargeTvNameStyle"
-        android:layout_weight="30" />
+        android:layout_weight="22" />
 
     <TextView
         android:id="@+id/tvPost"
