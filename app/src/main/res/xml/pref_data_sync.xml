@@ -32,6 +32,7 @@
         android:defaultValue="@string/pref_default_password"/>
 
     <ListPreference
+        android:defaultValue="1"
         android:entries="@array/pref_screen_ids_titles"
         android:entryValues="@array/pref_screen_ids_values"
         android:key="@string/pref_screen_ids_key"

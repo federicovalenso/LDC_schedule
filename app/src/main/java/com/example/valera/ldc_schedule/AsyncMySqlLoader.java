@@ -48,6 +48,8 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<Stri
             MySqlConnector msc = getConnector();
             if (msc != null) {
                 data = new ArrayList<>();
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Activity.getApplicationContext());
+                String screen = prefs.getString((String) Activity.getText(R.string.pref_screen_ids_key), "");
                 ResultSet rs = msc.execSqlStatement(
                         "SELECT " +
                         "d.*," +
@@ -57,7 +59,8 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<Stri
                         "FROM docs d " +
                         "LEFT JOIN posts ON posts.id=d.post_id " +
                         "JOIN sched s ON s.doc_id=d.doc_id " +
-                        "WHERE fl_display=1 " +
+                        "WHERE fl_display=1 AND " +
+                        "screen_id=" + screen + " " +
                         "ORDER BY screen_position ASC " +
                         "LIMIT 9");
                 while (rs.next()){
@@ -112,13 +115,16 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<Stri
         String userName;
         String password;
 
-        MySqlConnectionGetter(String ... args) {
+        MySqlConnectionGetter(final String serverAddress,
+                              final String baseName,
+                              final String userName,
+                              final String password) {
             super();
             connector = null;
-            serverAddress = args[0];
-            baseName = args[1];
-            userName = args[2];
-            password = args[3];
+            this.serverAddress = serverAddress;
+            this.baseName = baseName;
+            this.userName = userName;
+            this.password = password;
         }
 
         @Override
