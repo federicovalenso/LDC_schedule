@@ -3,36 +3,20 @@ package com.example.valera.ldc_schedule;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
-
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_CAB;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_POST;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_SAT;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI_END;
 
 /**
  * AsyncTask.
  * Загружает данные через MySqlConnector с MySql-сервера
  */
 
-class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<String, String>>> {
+class AsyncMySqlLoader extends AsyncTask<String, Integer, Schedule> {
 
     private ScheduleFullscreenActivity Activity;
 
@@ -41,13 +25,12 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<Stri
     }
 
     @Override
-    protected ArrayList doInBackground(String... params) {
+    protected Schedule doInBackground(String... params) {
         final String LOG_CONN = "AsynkTask mySqlLoader";
-        ArrayList<HashMap<String, String>> data = null;
+        Schedule data = null;
         try {
             MySqlConnector msc = getConnector();
             if (msc != null) {
-                data = new ArrayList<>();
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Activity.getApplicationContext());
                 String screen = prefs.getString((String) Activity.getText(R.string.pref_screen_ids_key), "");
                 ResultSet rs = msc.execSqlStatement(
@@ -63,24 +46,12 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<Stri
                         "screen_id=" + screen + " " +
                         "ORDER BY screen_position ASC " +
                         "LIMIT 9");
-                while (rs.next()){
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put(ATTR_CAB,rs.getString(ATTR_CAB));
-                    map.put(ATTR_DOC_SNP, rs.getString(ATTR_DOC_SNP));
-                    map.put(ATTR_DOC_POST, rs.getString(ATTR_DOC_POST));
-                    map.put(ATTR_SCHED_MON, rs.getString(ATTR_SCHED_MON));
-                    map.put(ATTR_SCHED_MON_END, rs.getString(ATTR_SCHED_MON_END));
-                    map.put(ATTR_SCHED_TUE, rs.getString(ATTR_SCHED_TUE));
-                    map.put(ATTR_SCHED_TUE_END, rs.getString(ATTR_SCHED_TUE_END));
-                    map.put(ATTR_SCHED_WED, rs.getString(ATTR_SCHED_WED));
-                    map.put(ATTR_SCHED_WED_END, rs.getString(ATTR_SCHED_WED_END));
-                    map.put(ATTR_SCHED_THU, rs.getString(ATTR_SCHED_THU));
-                    map.put(ATTR_SCHED_THU_END, rs.getString(ATTR_SCHED_THU_END));
-                    map.put(ATTR_SCHED_FRI, rs.getString(ATTR_SCHED_FRI));
-                    map.put(ATTR_SCHED_FRI_END, rs.getString(ATTR_SCHED_FRI_END));
-                    map.put(ATTR_SCHED_SAT, rs.getString(ATTR_SCHED_SAT));
-                    data.add(map);
-                }
+                int evenRowColor = ContextCompat.getColor(Activity.getApplicationContext(), R.color.sched_row_even_color);
+                int oddRowColor = ContextCompat.getColor(Activity.getApplicationContext(), R.color.sched_row_odd_color);
+                HashMap<Schedule.rowPosition, Integer> colors = new HashMap<>();
+                colors.put(Schedule.rowPosition.EVEN, evenRowColor);
+                colors.put(Schedule.rowPosition.ODD, oddRowColor);
+                data = new Schedule(rs, colors);
             }
         } catch (Exception e) {
             Log.e(LOG_CONN, "doInBackground: ", e);
@@ -89,7 +60,7 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, ArrayList<HashMap<Stri
     }
 
     @Override
-    protected void onPostExecute(ArrayList<HashMap<String, String>> data) {
+    protected void onPostExecute(Schedule data) {
         super.onPostExecute(data);
         Activity.setSchedData(data);
     }

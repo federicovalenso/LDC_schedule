@@ -28,14 +28,9 @@ public class schedAdapter extends BaseAdapter {
     private int[] mTo;
     private String[] mFrom;
     private ViewBinder mViewBinder;
-    private int[] mColors;
-
-    private List<? extends Map<String, ?>> mData;
-
+    private Schedule mData;
     private int mResource;
 
-    private SimpleFilter mFilter;
-    private ArrayList<Map<String, ?>> mUnfilteredData;
 
     /**
      * Constructor
@@ -53,17 +48,15 @@ public class schedAdapter extends BaseAdapter {
      *        in the from parameter.
      */
     public schedAdapter(Context context,
-                        List<? extends Map<String, ?>> data,
+                        Schedule data,
                         @LayoutRes int resource,
                         String[] from,
-                        @IdRes int[] to,
-                        @ColorInt int[] colors) {
+                        @IdRes int[] to) {
         mData = data;
         mResource = resource;
         mFrom = from;
         mTo = to;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mColors = colors;
     }
 
     /**
@@ -109,7 +102,7 @@ public class schedAdapter extends BaseAdapter {
     }
 
     private void bindView(int position, View view) {
-        final Map dataSet = mData.get(position);
+        final Schedule.ScheduleRow dataSet = mData.get(position);
         if (dataSet == null) {
             return;
         }
@@ -150,9 +143,7 @@ public class schedAdapter extends BaseAdapter {
                         // Note: keep the instanceof TextView check at the bottom of these
                         // ifs since a lot of views are TextViews (e.g. CheckBoxes).
                         setViewText((TextView) v, text);
-                        if (position < mColors.length) {
-                            setViewBackgroundColor((TextView) v, mColors[position]);
-                        }
+                        setViewBackgroundColor((TextView) v, dataSet.getColor());
                     } else if (v instanceof ImageView) {
                         if (data instanceof Integer) {
                             setViewImage((ImageView) v, (Integer) data);
@@ -248,13 +239,6 @@ public class schedAdapter extends BaseAdapter {
         v.setBackgroundColor(color);
     }
 
-    public Filter getFilter() {
-        if (mFilter == null) {
-            mFilter = new SimpleFilter();
-        }
-        return mFilter;
-    }
-
     /**
      * This class can be used by external clients of SimpleAdapter to bind
      * values to views.
@@ -284,75 +268,5 @@ public class schedAdapter extends BaseAdapter {
          * @return true if the data was bound to the view, false otherwise
          */
         boolean setViewValue(View view, Object data, String textRepresentation);
-    }
-
-    /**
-     * <p>An array filters constrains the content of the array adapter with
-     * a prefix. Each item that does not start with the supplied prefix
-     * is removed from the list.</p>
-     */
-    private class SimpleFilter extends Filter {
-
-        @Override
-        protected FilterResults performFiltering(CharSequence prefix) {
-            FilterResults results = new FilterResults();
-
-            if (mUnfilteredData == null) {
-                mUnfilteredData = new ArrayList<Map<String, ?>>(mData);
-            }
-
-            if (prefix == null || prefix.length() == 0) {
-                ArrayList<Map<String, ?>> list = mUnfilteredData;
-                results.values = list;
-                results.count = list.size();
-            } else {
-                String prefixString = prefix.toString().toLowerCase();
-
-                ArrayList<Map<String, ?>> unfilteredValues = mUnfilteredData;
-                int count = unfilteredValues.size();
-
-                ArrayList<Map<String, ?>> newValues = new ArrayList<Map<String, ?>>(count);
-
-                for (int i = 0; i < count; i++) {
-                    Map<String, ?> h = unfilteredValues.get(i);
-                    if (h != null) {
-
-                        int len = mTo.length;
-
-                        for (int j=0; j<len; j++) {
-                            String str =  (String)h.get(mFrom[j]);
-
-                            String[] words = str.split(" ");
-                            int wordCount = words.length;
-
-                            for (int k = 0; k < wordCount; k++) {
-                                String word = words[k];
-
-                                if (word.toLowerCase().startsWith(prefixString)) {
-                                    newValues.add(h);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                results.values = newValues;
-                results.count = newValues.size();
-            }
-
-            return results;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            //noinspection unchecked
-            mData = (List<Map<String, ?>>) results.values;
-            if (results.count > 0) {
-                notifyDataSetChanged();
-            } else {
-                notifyDataSetInvalidated();
-            }
-        }
     }
 }

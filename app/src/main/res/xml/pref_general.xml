@@ -3,6 +3,6 @@
     <yuku.ambilwarna.widget.AmbilWarnaPreference
         android:title="@string/pref_row_color_picker"
         android:key="@string/pref_row_color_picker_key"
-        android:defaultValue="@color/sched_row_second_color" />
+        android:defaultValue="@color/sched_row_even_color" />
 
 </PreferenceScreen>

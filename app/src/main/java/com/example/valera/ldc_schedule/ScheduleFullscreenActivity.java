@@ -3,13 +3,13 @@ package com.example.valera.ldc_schedule;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,27 +22,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_CAB;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_SNP;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_DOC_POST;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_MON_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_TUE_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_WED_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_THU_END;
-import static com.example.valera.ldc_schedule.MySqlConnector.ATTR_SCHED_FRI_END;
 
 public class ScheduleFullscreenActivity extends AppCompatActivity {
     /**
@@ -123,15 +106,16 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         }
     };
 
-    final private String LOG_SCHED_ACT      = "Schedule activity";
+    final private String LOG_SCHED_ACT = "Schedule activity";
+    private SharedPreferences prefs;
     private TextView tvDateTime;
-    private ArrayList<HashMap<String, String>> alSchedule;
+    private Schedule schedule;
     private schedAdapter lvAdapter;
-    Timer timerDataRefresher;
-    Timer timerDateTimeRefresher;
-    TimerTask ttDataRefresher;
-    TimerTask ttDateTimeRefresher;
-    final private long lDataRefresherTimerInterval = 60*1000;
+    private Timer timerDataRefresher;
+    private Timer timerDateTimeRefresher;
+    private TimerTask ttDataRefresher;
+    private TimerTask ttDateTimeRefresher;
+    private long lDataRefresherTimerInterval;
     final private long lDateTimeRefresherTimerInterval = 1000;
 
     @Override
@@ -140,8 +124,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_schedule_fullscreen);
         PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
         tvDateTime = (TextView) findViewById(R.id.tvDateTime);
-        timerDateTimeRefresher = new Timer();
-        refreshDateTimeByTimer();
         mVisible = true;
         mContentView = (ListView) findViewById(R.id.fullscreen_content);
         // Set up the user interaction to manually show or hide the system UI.
@@ -158,20 +140,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 toggle();
             }
         });
-        String[] from = {
-                ATTR_CAB,
-                ATTR_DOC_SNP,
-                ATTR_DOC_POST,
-                ATTR_SCHED_MON,
-                ATTR_SCHED_MON_END,
-                ATTR_SCHED_TUE,
-                ATTR_SCHED_TUE_END,
-                ATTR_SCHED_WED,
-                ATTR_SCHED_WED_END,
-                ATTR_SCHED_THU,
-                ATTR_SCHED_THU_END,
-                ATTR_SCHED_FRI,
-                ATTR_SCHED_FRI_END};
         int[] to = {
                 R.id.tvCab,
                 R.id.tvDoc,
@@ -186,26 +154,14 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
                 R.id.tvThuEnd,
                 R.id.tvFri,
                 R.id.tvFriEnd};
-        int firstRowColor = ContextCompat.getColor(this, R.color.sched_row_first_color);
-        int secondRowColor = ContextCompat.getColor(this, R.color.sched_row_second_color);
-        int[] colors = {
-                firstRowColor,
-                secondRowColor,
-                firstRowColor,
-                secondRowColor,
-                firstRowColor,
-                secondRowColor,
-                firstRowColor,
-                secondRowColor,
-                firstRowColor};
-        alSchedule = new ArrayList<>();
-        timerDataRefresher = new Timer();
-        refreshDataByTimer();
-        lvAdapter = new schedAdapter(this, alSchedule, R.layout.doc_row, from, to, colors);
+        schedule = new Schedule();
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        lvAdapter = new schedAdapter(this, schedule, R.layout.doc_row, Schedule.columnHeaders, to);
         mContentView.setAdapter(lvAdapter);
     }
 
     void refreshDateTimeByTimer() {
+        timerDateTimeRefresher = new Timer();
         if (ttDateTimeRefresher != null) {
             ttDateTimeRefresher.cancel();
         }
@@ -224,6 +180,8 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     }
 
     void refreshDataByTimer() {
+        timerDataRefresher = new Timer();
+        lDataRefresherTimerInterval = Integer.parseInt(prefs.getString((String) this.getText(R.string.pref_sync_frequency_key), "")) * 60 * 1000;
         if (ttDataRefresher != null) {
             ttDataRefresher.cancel();
         }
@@ -231,7 +189,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             ttDataRefresher = new TimerTask() {
                 @Override
                 public void run() {
-                    Log.d(LOG_SCHED_ACT, "Don't sleep");
+                    Log.d(LOG_SCHED_ACT, "Starting refreshing data");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -254,8 +212,8 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        refreshDateTimeByTimer();
-//        refreshDataByTimer();
+        refreshDateTimeByTimer();
+        refreshDataByTimer();
     }
 
     @Override
@@ -271,7 +229,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.mi_refresh:
                 refreshData();
                 break;
@@ -333,15 +291,14 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    public void setSchedData(ArrayList<HashMap<String, String>> inAlData){
-        if (inAlData != null) {
-            alSchedule.clear();
-            for (HashMap<String, String> item : inAlData){
-                alSchedule.add(item);
+    public void setSchedData(Schedule schedule) {
+        if (schedule != null) {
+            this.schedule.clear();
+            for (Schedule.ScheduleRow row : schedule) {
+                this.schedule.add(row);
             }
             lvAdapter.notifyDataSetChanged();
-        }
-        else {
+        } else {
             Toast.makeText(this.getApplicationContext(),
                     "Empty data returned from server",
                     Toast.LENGTH_LONG).show();
@@ -351,16 +308,18 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         }
     }
 
-    private void refreshData(){
+    private void refreshData() {
 
         if (checkNetworkConnection()) {
             AsyncMySqlLoader asyncMSL = new AsyncMySqlLoader(this);
             asyncMSL.execute();
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(),
                     "Check your internet connection",
                     Toast.LENGTH_LONG).show();
+            if (mVisible == false) {
+                show();
+            }
         }
     }
 

@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.example.valera.ldc_schedule"
         minSdkVersion 15
@@ -20,6 +19,7 @@ android {
     }
     productFlavors {
     }
+    buildToolsVersion '26.0.2'
 }
 
 dependencies {
