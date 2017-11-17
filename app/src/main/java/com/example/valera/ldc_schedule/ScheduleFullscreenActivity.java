@@ -110,6 +110,20 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private TextView tvDateTime;
     private Schedule schedule;
+    final private int[] viewsToShowSchedule = {
+            R.id.tvCab,
+            R.id.tvDoc,
+            R.id.tvPost,
+            R.id.tvMon,
+            R.id.tvMonEnd,
+            R.id.tvTue,
+            R.id.tvTueEnd,
+            R.id.tvWed,
+            R.id.tvWedEnd,
+            R.id.tvThu,
+            R.id.tvThuEnd,
+            R.id.tvFri,
+            R.id.tvFriEnd};
     private schedAdapter lvAdapter;
     private Timer timerDataRefresher;
     private Timer timerDateTimeRefresher;
@@ -122,41 +136,24 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_fullscreen);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
-        tvDateTime = (TextView) findViewById(R.id.tvDateTime);
-        mVisible = true;
+        mVisible = false;
         mContentView = (ListView) findViewById(R.id.fullscreen_content);
-        // Set up the user interaction to manually show or hide the system UI.
+        // Клик по строкам расписания стрывает и отображает action bar
         mContentView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toggle();
             }
         });
-        TextView tvDateTime = (TextView) findViewById(R.id.tvDateTime);
+        tvDateTime = (TextView) findViewById(R.id.tvDateTime);
         tvDateTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggle();
             }
         });
-        int[] to = {
-                R.id.tvCab,
-                R.id.tvDoc,
-                R.id.tvPost,
-                R.id.tvMon,
-                R.id.tvMonEnd,
-                R.id.tvTue,
-                R.id.tvTueEnd,
-                R.id.tvWed,
-                R.id.tvWedEnd,
-                R.id.tvThu,
-                R.id.tvThuEnd,
-                R.id.tvFri,
-                R.id.tvFriEnd};
         schedule = new Schedule();
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        lvAdapter = new schedAdapter(this, schedule, R.layout.doc_row, Schedule.columnHeaders, to);
+        lvAdapter = new schedAdapter(this, schedule, R.layout.doc_row, Schedule.columnHeaders, viewsToShowSchedule);
         mContentView.setAdapter(lvAdapter);
     }
 
@@ -212,6 +209,8 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         refreshDateTimeByTimer();
         refreshDataByTimer();
     }
@@ -291,16 +290,19 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    public void setSchedData(Schedule schedule) {
+    public void setSchedule(Schedule schedule) {
         if (schedule != null) {
             this.schedule.clear();
             for (Schedule.ScheduleRow row : schedule) {
                 this.schedule.add(row);
             }
             lvAdapter.notifyDataSetChanged();
+            if (mVisible == true) {
+                hide();
+            }
         } else {
             Toast.makeText(this.getApplicationContext(),
-                    "Empty data returned from server",
+                    "Данные с сервера не были получены",
                     Toast.LENGTH_LONG).show();
             if (mVisible == false) {
                 show();
@@ -315,7 +317,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             asyncMSL.execute();
         } else {
             Toast.makeText(getApplicationContext(),
-                    "Check your internet connection",
+                    "Проверьте подключение к сети",
                     Toast.LENGTH_LONG).show();
             if (mVisible == false) {
                 show();

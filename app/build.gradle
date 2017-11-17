@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            storeFile file('C:/mano.jks')
+        }
+    }
     compileSdkVersion 23
     defaultConfig {
         applicationId "com.example.valera.ldc_schedule"

@@ -5,11 +5,10 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * AsyncTask.
@@ -62,53 +61,15 @@ class AsyncMySqlLoader extends AsyncTask<String, Integer, Schedule> {
     @Override
     protected void onPostExecute(Schedule data) {
         super.onPostExecute(data);
-        Activity.setSchedData(data);
+        Activity.setSchedule(data);
     }
 
-    private MySqlConnector getConnector() throws InterruptedException {
+    private MySqlConnector getConnector() throws InterruptedException, ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Activity.getApplicationContext());
         String serverAddress = prefs.getString((String) Activity.getText(R.string.pref_server_address_key), "");
         String baseName = prefs.getString((String) Activity.getText(R.string.pref_base_name_key), "");
         String userName = prefs.getString((String) Activity.getText(R.string.pref_user_name_key), "");
         String password = prefs.getString((String) Activity.getText(R.string.pref_password_key), "");
-        MySqlConnectionGetter getter = new MySqlConnectionGetter(serverAddress, baseName, userName, password);
-        getter.start();
-        TimeUnit.SECONDS.sleep(5);
-        getter.interrupt();
-        return getter.getConnector();
-    }
-
-    private class MySqlConnectionGetter extends Thread {
-
-        private MySqlConnector connector;
-        String serverAddress;
-        String baseName;
-        String userName;
-        String password;
-
-        MySqlConnectionGetter(final String serverAddress,
-                              final String baseName,
-                              final String userName,
-                              final String password) {
-            super();
-            connector = null;
-            this.serverAddress = serverAddress;
-            this.baseName = baseName;
-            this.userName = userName;
-            this.password = password;
-        }
-
-        @Override
-        public void run() {
-            try {
-                connector = new MySqlConnector(serverAddress, baseName, userName, password);
-            } catch (Exception e) {
-                Toast.makeText(Activity.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-
-        public MySqlConnector getConnector() {
-            return connector;
-        }
+        return new MySqlConnector(serverAddress, baseName, userName, password);
     }
 }
