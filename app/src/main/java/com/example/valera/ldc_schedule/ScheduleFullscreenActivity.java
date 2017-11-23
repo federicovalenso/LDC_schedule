@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,8 +47,10 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
      */
 
     private static final int UI_ANIMATION_DELAY = 300;
+    private boolean mVisible = true;
     private final Handler mHideHandler = new Handler();
     private ListView mContentView;
+    private View mFullscreenView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -57,7 +60,8 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            mVisible = false;
+            mFullscreenView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -70,13 +74,13 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         @Override
         public void run() {
             // Delayed display of UI elements
+            mVisible = true;
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
             }
         }
     };
-    private boolean mVisible;
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
@@ -98,15 +102,8 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         }
     };
 
-    private final View.OnTouchListener mRefreshDataListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            refreshData();
-            return false;
-        }
-    };
-
     final private String LOG_SCHED_ACT = "Schedule activity";
+    private ImageView imgSync;
     private SharedPreferences prefs;
     private TextView tvDateTime;
     private Schedule schedule;
@@ -136,25 +133,41 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_fullscreen);
-        mVisible = false;
-        mContentView = (ListView) findViewById(R.id.fullscreen_content);
-        // Клик по строкам расписания стрывает и отображает action bar
+        mFullscreenView = findViewById(R.id.fullscreen_widget);
+        tvDateTime = findViewById(R.id.tvDateTime);
+        imgSync = findViewById(R.id.imgSync);
+        imgSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggle();
+            }
+        });
+        mContentView = findViewById(R.id.schedule_content);
         mContentView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toggle();
             }
         });
-        tvDateTime = (TextView) findViewById(R.id.tvDateTime);
-        tvDateTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggle();
-            }
-        });
         schedule = new Schedule();
         lvAdapter = new schedAdapter(this, schedule, R.layout.doc_row, Schedule.columnHeaders, viewsToShowSchedule);
         mContentView.setAdapter(lvAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        refreshDateTimeByTimer();
+        refreshDataByTimer();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timerDateTimeRefresher.cancel();
+        timerDataRefresher.cancel();
     }
 
     void refreshDateTimeByTimer() {
@@ -178,7 +191,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
 
     void refreshDataByTimer() {
         timerDataRefresher = new Timer();
-        lDataRefresherTimerInterval = Integer.parseInt(prefs.getString((String) this.getText(R.string.pref_sync_frequency_key), "")) * 60 * 1000;
+        lDataRefresherTimerInterval = Integer.parseInt(prefs.getString((String) this.getText(R.string.pref_sync_frequency_key), "")) * 40 * 1000;
         if (ttDataRefresher != null) {
             ttDataRefresher.cancel();
         }
@@ -197,22 +210,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             };
             timerDataRefresher.schedule(ttDataRefresher, 0, lDataRefresherTimerInterval);
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        timerDateTimeRefresher.cancel();
-        timerDataRefresher.cancel();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        refreshDateTimeByTimer();
-        refreshDataByTimer();
     }
 
     @Override
@@ -238,16 +235,6 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
         return false;
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(100);
-    }
-
     private void toggle() {
         if (mVisible) {
             hide();
@@ -257,28 +244,16 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
     }
 
     private void hide() {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        mVisible = false;
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
         mHideHandler.removeCallbacks(mShowPart2Runnable);
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
     @SuppressLint("InlinedApi")
     private void show() {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        mFullscreenView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
         mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+        mHideHandler.postDelayed(mShowPart2Runnable, 2*UI_ANIMATION_DELAY);
     }
 
     /**
@@ -292,6 +267,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
 
     public void setSchedule(Schedule schedule) {
         if (schedule != null) {
+            imgSync.setVisibility(View.GONE);
             this.schedule.clear();
             for (Schedule.ScheduleRow row : schedule) {
                 this.schedule.add(row);

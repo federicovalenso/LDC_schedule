@@ -9,7 +9,7 @@
 
     <header
         android:fragment="com.example.valera.ldc_schedule.SettingsActivity$DataSyncPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
+        android:icon="@drawable/ic_sync_24dp"
         android:title="@string/pref_header_data_sync" />
 
 </preference-headers>

@@ -1,11 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullscreen_widget"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/background_light"
+    android:keepScreenOn="true"
     android:orientation="vertical"
     android:weightSum="100"
-    android:keepScreenOn="true"
     tools:context="com.example.valera.ldc_schedule.ScheduleFullscreenActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -14,6 +16,7 @@
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,10 +34,17 @@
             android:background="@android:color/black"
             android:gravity="center_vertical|center_horizontal"
             android:textColor="@color/time_row_color"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgSync"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/sync_img_descr"
+        app:srcCompat="@drawable/ic_sync_24dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,7 +59,7 @@
         <TextView
             style="@style/schedTvColNameVertStyle"
             android:layout_weight="8"
-            android:text="@string/cab_col"/>
+            android:text="@string/cab_col" />
 
         <TextView
             style="@style/schedTvColNameVertStyle"
@@ -98,7 +108,7 @@
         android:orientation="horizontal">
 
         <ListView
-            android:id="@+id/fullscreen_content"
+            android:id="@+id/schedule_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></ListView>
     </LinearLayout>

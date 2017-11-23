@@ -52,9 +52,8 @@ final class Schedule implements Iterable<Schedule.ScheduleRow> {
                     colors.get(getRowPosition(rowIndex))));
             rowIndex++;
         }
-        int dataCount = sqlData.getFetchSize();
-        if (minRowsCount > dataCount) {
-            for (int i = dataCount - 1; i < minRowsCount; i++) {
+        if (minRowsCount > rowIndex) {
+            for (int i = rowIndex; i <= minRowsCount; i++) {
                 HashMap<String, String> map = new HashMap<>();
                 for (String header : columnHeaders) {
                     map.put(header, "");
