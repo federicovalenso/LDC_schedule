@@ -1,4 +1,4 @@
-package com.example.valera.ldc_schedule;
+package ru.mano_ldc.valera.ldc_schedule;
 
 import android.util.Log;
 

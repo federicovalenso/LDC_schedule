@@ -1,15 +1,17 @@
-package com.example.valera.ldc_schedule;
+package ru.mano_ldc.valera.ldc_schedule;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -191,7 +193,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
 
     void refreshDataByTimer() {
         timerDataRefresher = new Timer();
-        lDataRefresherTimerInterval = Integer.parseInt(prefs.getString((String) this.getText(R.string.pref_sync_frequency_key), "")) * 40 * 1000;
+        lDataRefresherTimerInterval = Integer.parseInt(prefs.getString((String) this.getText(R.string.pref_sync_frequency_key), "")) * 60 * 1000;
         if (ttDataRefresher != null) {
             ttDataRefresher.cancel();
         }
@@ -276,13 +278,12 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             if (mVisible == true) {
                 hide();
             }
+            tvDateTime.setTextColor(ContextCompat.getColor(this, R.color.time_row_color));
         } else {
             Toast.makeText(this.getApplicationContext(),
                     "Данные с сервера не были получены",
                     Toast.LENGTH_LONG).show();
-            if (mVisible == false) {
-                show();
-            }
+            tvDateTime.setTextColor(Color.RED);
         }
     }
 
@@ -295,9 +296,7 @@ public class ScheduleFullscreenActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),
                     "Проверьте подключение к сети",
                     Toast.LENGTH_LONG).show();
-            if (mVisible == false) {
-                show();
-            }
+            tvDateTime.setTextColor(Color.RED);
         }
     }
 

@@ -3,12 +3,12 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.example.valera.ldc_schedule.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="ru.mano_ldc.valera.ldc_schedule.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.example.valera.ldc_schedule.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="ru.mano_ldc.valera.ldc_schedule.SettingsActivity$DataSyncPreferenceFragment"
         android:icon="@drawable/ic_sync_24dp"
         android:title="@string/pref_header_data_sync" />
 

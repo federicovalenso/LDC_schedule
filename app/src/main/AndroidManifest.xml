@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.valera.ldc_schedule">
+    package="ru.mano_ldc.valera.ldc_schedule">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ScheduleFullscreenActivity"
+            android:name="ru.mano_ldc.valera.ldc_schedule.ScheduleFullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme">
@@ -24,17 +23,8 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".SchedBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
         <activity
-            android:name=".SettingsActivity"
+            android:name="ru.mano_ldc.valera.ldc_schedule.SettingsActivity"
             android:label="@string/title_activity_settings"></activity>
     </application>
 
